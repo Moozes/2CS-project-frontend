@@ -3,6 +3,7 @@ import { useState } from 'react';
 import logo from './logo.svg';
 import Login from './components/Login';
 import Signup from './components/Signup';
+import Home from './pages/Home';
 import CalculatorUI from './components/CalculatorUI';
 import Navbar from './components/Navbar';
 import { CssBaseline } from '@material-ui/core';
@@ -45,7 +46,8 @@ function App() {
       </Router> */}
 
 
-      <CalculatorUI/>
+      {/* <CalculatorUI/> */}
+      <Home/>
     </>
   );
 }
