@@ -1,5 +1,5 @@
 
-
+import axios from 'axios';
 import { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -13,9 +13,11 @@ import {
     TextField,
     Input,
     Button,
-    Grid
+    Grid,
+    Typography
 } from '@material-ui/core';
-import path_diagram from './calculatorAlgorithme';
+import path_diagram from '../components/calculatorAlgorithme';
+import {serverUrl} from '../api/api';
 // console.log(path_diagram);
 
 const useStyles = makeStyles(theme => ({
@@ -141,10 +143,24 @@ function index_of_member(table, relation) {
     return i;
 }
 
+
+
+
+
+
 export default (props) => {
     const classes = useStyles(props);
     const [table, setTable] = useState(TABLE);
     const [resultTable, setResultTable] = useState([]);
+    const [pictures, setPictures] = useState([
+        {
+            picture : "",
+            discription : ""
+        }
+    ]);
+    const [length, setLength] = useState(1);
+    const [msg, setMsg] = useState("");
+    
 
     const handleChange = e => {
         let newTable = [...table];
@@ -160,12 +176,75 @@ export default (props) => {
         path_diagram(table, inheritance_result_table);
         setResultTable(inheritance_result_table);
     }
+
+    const fileChengeHandler = (e) => {
+        const index = parseInt(e.target.id);
+        let newPictures = pictures;
+        newPictures[index].picture = e.target.files[0];
+        setPictures(newPictures);
+        console.log(pictures);
+    }
+
+    const discriptionChangeHandler = (e) => {
+        const index = parseInt(e.target.id);
+        let newPictures = pictures;
+        newPictures[index].discription = e.target.value
+        setPictures(newPictures);
+        console.log(pictures);
+    }
+
+    const addField = () => {
+        console.log("click")
+        let newPictures = pictures;
+        newPictures.push(
+            {
+                picture : "",
+                discription : ""
+            }
+        );
+        setPictures(newPictures);
+        setLength(newPictures.length);
+        console.log(pictures);
+    }
+
+    const handleAllSubmit = () => {
+        let fd = new FormData();
+        let newTable = JSON.stringify(table);
+        let newResultTable = JSON.stringify(resultTable);
+        // let token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNDVlMTlmMTVhZTlhMTUwMGQ2NmEyNCIsInJvbGUiOiJjbGllbnQiLCJpYXQiOjE2MzE5Njk2OTUsImV4cCI6MTYzMjIyODg5NX0.8ESTCW_WwyhQ-kYv67ZlF0bAYahUvbonvTr2LFeJeDg";
+        let token = sessionStorage.getItem('token');
+
+        for(let i = 0; i < pictures.length; i++) {
+            fd.append("photos", pictures[i].picture, pictures[i].discription);
+        }
+        fd.append("token", token);
+        fd.append("table", newTable);
+        fd.append("result", newResultTable);
+        axios.post(serverUrl+"/client/submit", fd)
+        .then(res => {
+            if(res.data.error)
+                setMsg(res.data.error);
+            else 
+                setMsg(res.data.message)
+        })
+        .catch(err => console.log(err))
+
+    }
     return (
         <>
+        {msg != "" && (    
+            <Typography 
+                fullWidth
+                align="center"
+                color="primary"
+            >
+                {msg}
+            </Typography>
+        )}
         <Grid container spacing={2}>
             <Grid item xs={6}>
             <form onSubmit={handleSubmit}>
-                <TableContainer component={Paper}  >
+                <TableContainer component={Paper} className={classes.half} >
                     <Table aria-label="simple table" size="small" >
                     <TableHead>
                         <TableRow>
@@ -245,6 +324,40 @@ export default (props) => {
             )}
             </Grid>
         </Grid>
+        {pictures.map((elm, index) => (
+            <div key={index}>
+                <Input
+                    type="file"
+                    onChange={fileChengeHandler}
+                    id={`${index}`}
+                />
+                <TextField
+                    variant="outlined"
+                    placeholder="discription"
+                    type="text"
+                    id={`${index}`}
+                    onChange={discriptionChangeHandler}
+                    // value={pictures[0].discription}
+                />
+                <br/>
+            </div>
+        ))}
+        <br/>
+        <Button 
+            variant="contained"
+            onClick={addField}
+        >
+            add field
+        </Button>
+
+        <br/>
+        <Button 
+            variant="contained" 
+            onClick={handleAllSubmit}
+            color = "primary"
+        >
+            Submit
+        </Button>
         </>
     )
 }

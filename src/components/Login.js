@@ -8,6 +8,8 @@ import {
     Container,
     makeStyles
 } from "@material-ui/core";
+import axios from "axios";
+import { serverUrl } from "../api/api";
 
 const useStyles = makeStyles(theme => ({
     container : {
@@ -30,6 +32,8 @@ export default (props) => {
         password : ""
     });
 
+    const [error, setError] = useState("");
+
     const handleChange = e => {
         let newFormData = {...formData};
         newFormData[e.target.name] = e.target.value;
@@ -39,7 +43,27 @@ export default (props) => {
     const handleSubmit = e => {
         e.preventDefault();
         console.log("submited");
+        // send request to server if success, redirect to home or admin_home
+        axios.post(serverUrl+"/auth/signin", {
+            email: formData.email,
+            password : formData.password
+        })
+        .then(res => {
+            if(res.data.error) {
+                console.log(res.data.error);
+                setError(res.data.error)
+            } else {
+                props.saveToken(res.data.token);
+                if(res.data.role == "client")
+                    props.history.push('/client');
+                else 
+                props.history.push('/admin_home');
+            }
+        })
+        .catch(err => console.log(err))
+        
     }
+    console.log(serverUrl+"/signin");
     return (
         <Container maxWidth="xs"  className={classes.container} >
             <Paper className={classes.paper} elevation={4}>
@@ -74,6 +98,13 @@ export default (props) => {
                         onChange={handleChange}
                         required
                     />
+
+                    {error!="" && (
+                        <Typography color="secondary" >
+                            {error}
+                        </Typography>
+                    )}
+
                     <Button 
                         className={classes.marginB} 
                         fullWidth 
@@ -85,13 +116,13 @@ export default (props) => {
 
 
                 <br/>
-                <Typography  
+                {/* <Typography  
                     component="a" 
                     href="#" 
                     variant="subtitle1" 
                     color="textSecondary">
                     Forgot Password?
-                </Typography>
+                </Typography> */}
             </Paper>
         </Container>
     );

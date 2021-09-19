@@ -9,6 +9,8 @@ import {
     Container,
     makeStyles
 } from "@material-ui/core";
+import axios from "axios";
+import { serverUrl } from "../api/api";
 
 const useStyles = makeStyles(theme => ({
     div : {
@@ -41,6 +43,11 @@ export default (props) => {
         confirm_password : ""
     })
     const [error, setError] = useState("");
+    const [code , setCode] = useState(sessionStorage.getItem("code")? sessionStorage.getItem("code") : "");
+    const saveCode = code => {
+        sessionStorage.setItem("code", code);
+        setCode(code);
+    }
 
     const onInputChange = (e) => {
         let newFormData = {...formData};
@@ -61,10 +68,31 @@ export default (props) => {
             setError("passwords dont match!");
         else  {
             setError("");
-            // send request to server, if signup success redirect to login
-            props.history.push("/");
+            // send request to server, if signup success redirect home page
+            // signup(formData.email, formData.password, formData.phone, formData.name)
+            // .then(res => console.log(res))
+            // .catch(err => console.log(err))
+            // props.history.push("/");
+            axios.post(serverUrl+"/auth/signup", {
+                email: formData.email,
+                password : formData.password,
+                phone : formData.phone,
+                fullName : formData.name
+            })
+            .then(res => {
+                if(res.data.error) {
+                    console.log(res.data.error);
+                    setError(res.data.error);
+                } else {
+                    props.saveToken(res.data.token);
+                    saveCode(res.data.code);
+                    props.history.push('/code_verification');
+                }
+            })
+            .catch(err => console.log(err))
         } 
     }
+    console.log(serverUrl+"/signup");
     return (
         <div className={classes.div} >
             <Container maxWidth="xs"  className={classes.container} >

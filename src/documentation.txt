@@ -1,0 +1,28 @@
+the routing
+
+Auth    
+    loginin : ---
+        saveToken
+        history.push
+
+    signup : ---
+        saveToken
+        code verification redirect
+        history.push
+    codeverification
+
+client ---
+    Request :---
+        token---
+    Update : ---
+        token---
+    Home---
+
+Admin
+    AdminHome---
+        getAll pending cases
+    AdminArchive---
+        getall archive cases
+    calculator---
+
+logout sessionStorage.clear()---

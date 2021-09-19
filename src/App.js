@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { login } from './api/api';
 
 import logo from './logo.svg';
 import Login from './components/Login';
@@ -6,12 +7,21 @@ import Signup from './components/Signup';
 import Home from './pages/Home';
 import CalculatorUI from './components/CalculatorUI';
 import Navbar from './components/Navbar';
-import { CssBaseline } from '@material-ui/core';
+import Auth from './pages/Auth';
+import Client from './pages/Client';
+import UploadTest from './components/UploadTest';
+import Admin from './pages/Admin';
+import { 
+  CssBaseline,
+  Button,
+} from '@material-ui/core';
+
 import {
   Router,
   Switch,
   Route,
-  Redirect
+  Redirect,
+  Link
 } from "react-router-dom"
 import { createBrowserHistory } from "history"
 
@@ -27,27 +37,24 @@ function App() {
       setToken(token);
   }
 
+
   return (
     <>
       <CssBaseline/>
-      {/* <Login/> */}
-      {/* <Signup/> */}
 
-      {/* <Router history={history}>
-          <Navbar/>
+      <Router history={history}>
           <Switch>
-              <Route exact path="/">
-                  <Login history={history} saveToken={saveToken} />
+              <Route  path="/client">
+                  <Client history={history}/>
               </Route>
-              <Route path="/signup">
-                  <Signup history={history} />
+              <Route  path="/admin_home">
+                  <Admin history={history}/>
+              </Route>
+              <Route  path="/">
+                  <Auth history={history} saveToken={saveToken} />
               </Route>
           </Switch>
-      </Router> */}
-
-
-      {/* <CalculatorUI/> */}
-      <Home/>
+      </Router>
     </>
   );
 }

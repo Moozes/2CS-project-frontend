@@ -19,14 +19,15 @@ const useStyles = makeStyles(theme => ({
 
 export default (props) => {
     const classes = useStyles(props);
+    console.log(props)
     return (
         <AppBar position="static">
             <Toolbar>
                 <Typography variant="h6" className={classes.typography} >
                     Islamic Inheritance
                 </Typography>
-                <Button color="inherit" component={Link} to="/">Login</Button>
-                <Button color="inherit" component={Link} to="/signup">Signup</Button>
+                <Button color="inherit" component={Link} to={`/`} >Login</Button>
+                <Button color="inherit" component={Link} to={`/signup`}>Signup</Button>
             </Toolbar>
         </AppBar>
     )
